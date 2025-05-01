@@ -61,3 +61,26 @@ WHERE p_size BETWEEN 1 AND 10
 
 SELECT *
 FROM joined
+
+-- 2.4.3 Shipping Priority Query (Q3)
+-- This query retrieves the 10 unshipped orders with the highest value.
+-- 2.4.3.1 Business Question
+-- The Shipping Priority Query retrieves the shipping priority and potential revenue, defined as the sum of
+-- l_extendedprice * (1-l_discount), of the orders having the largest revenue among those that had not been shipped as
+-- of a given date. Orders are listed in decreasing order of revenue. If more than 10 unshipped orders exist, only the 10
+-- orders with the largest revenue are listed.
+
+SELECT o_orderkey, o_orderdate,
+SUM(l_extendedprice * (1 - l_discount)) AS revenue
+
+FROM customer AS C
+INNER JOIN orders AS O
+    ON c_custkey = o_custkey
+INNER JOIN lineitem AS L
+    ON o_orderkey = l_orderkey
+WHERE c_mktsegment IN ('MACHINERY', 'AUTOMOBILE')
+AND o_orderdate <= '1997-06-01'
+AND l_shipdate > '1997-06-01'
+GROUP BY 1,2
+ORDER BY revenue DESC, o_orderdate ASC
+LIMIT 10
